@@ -1,0 +1,218 @@
+---
+title: 第一周总结
+tags: 
+notebook: aaaa
+---
+
+#第一天
+###获取数据 使用爬虫获取 也有专门的网站收集数据
+
+###网页的特性
+    1、url
+    2、用html展示
+    3、通过http访问
+
+###除了python还有其他语言可以爬虫
+    php不能多线程
+    java修改太麻烦
+    c太难
+
+###python 简单可以调用其他语言的模块
+
+###实现爬虫的步骤
+    1、确定url
+    2、发起请求，服务器回应
+    3、拿到数据
+
+###爬虫分类
+    普通爬虫 为搜索引擎提供 漫无目的的
+    聚焦爬虫：有目的、有针对行的去互联网获取数据
+
+###语法
+import urllib.request
+url = 'http://www.tuniu.com/theme/qinzi/'
+response = urllib.request.urlopen(url) #请求
+
+###打开方式
+w 写
+r 读
+a 追加
+
+###各种模块
+urllib  是python自带的模块可以发起请求获取请求
+urllib.request 构建请求,发起请求获取回应
+urllib.parse 处理url的
+urllib.error 处理错误，一般都是try来用的
+ssl 这个是https免证书认证
+
+###urlopen方法
+urllib.request.urlopen() 发起请求， 返回一个对象（起个名字就叫response）
+    参数介绍：
+        1、url
+        2、data
+        3、timeout
+        4、cafile
+        5、capath
+        6、context
+response的方法有
+    response.decode('utf-8') 转成字符串
+    response.encode('utf-8') 转成二进制
+    response.getheaders()获取所有的响应头 response.getheaders('Content-Type')获取一个响应头信息
+    response.status #状态码
+
+###处理get请求的参数
+dict = {
+    'a'='a'
+}
+urllib.parse.urlencode(query=dict, encoding='utf-8')处理get请求的参数
+
+
+
+urllib.request.Request() 构建一个请求对象
+    url
+    data
+    headers={}
+    origin_req_host
+    method
+
+#第二天
+pos请求加data参数
+    是个字典
+    并且要转码成二进制
+
+1.使用urlencode转成url编码格式，在转换成字节
+from_data = parse.urlencode(from_data).encode('utf-8')
+
+
+容错处理
+    导入import urllib.error
+    try:
+        urllib.request.urlopen(url)
+    except urllib.error.HTTPError as err:  一般是服务器可以连接上但是请求失败
+        print(err)
+        print('HTTPError')
+    except urllib.error.URLError as err:  网络不通
+        print(err)
+        print("URLErrer")
+    else:
+        print('请求成功')
+
+
+设置印象源
+
+正则re
+python 里有正则模块
+    re.compile() 构建正则对象
+    re.findall() 在全部文本中匹配到所有的正则结果
+    re.sub() 替换
+    re.match 从开始位置匹配，之匹配一次
+    re.search 从全文中匹配，只匹配一次
+    re.split 分割字符串
+
+
+import re
+string = '<div class="upload-fail-tip">请先设置语种，然后点击 [翻译] 按钮开始翻译</div>'
+
+
+pattren = re.compile('<div(.*?)请',re.S)
+reslut = re.match(pattren,string)
+print(reslut.group(0))
+print('第一次\n')
+
+
+pattren = re.compile('<div(.*?)请',re.S)
+reslut = re.findall(pattren, string)
+print(reslut[0])
+print('第二次\n')
+
+
+pattren = re.compile('<div(.*?)请',re.S)
+reslut = re.sub(pattren,'sddfsdfdsf', string)
+print(reslut)
+print('第三次\n')
+
+
+pattren = re.compile('<div(.*?)请',re.S)
+reslut = re.search(pattren,string)
+print(reslut.group(0))
+print('第四次\n')
+
+
+pattren = re.compile('<',re.S)
+reslut = re.split(pattren,string)
+print(reslut.group(0))
+print('第五次\n')
+
+
+#第三天
+
+
+第一个知识点
+urllib.parse 对url进行解析、合并、拆分、编码
+
+duiurl进行解析
+result = urllib.parse.urlparse(url)
+    scheme:协议
+    netloc：域名
+    path：资源路径
+    params：参数
+    query：查询条件
+    fragment：锚点，相当于一个定位，假如有锚点，那么你在访问url的时候，会跳到指定位置
+    ParseResult(scheme='https', netloc='www.readnovel.com', path='/book/9500446903583303', params='', query='', fragment='Catalog')
+
+
+url的拼接
+    components:是一个list
+    components = ('https','www.readnovel.com','/book/9500446903583303','','','Catalog')
+    result = urllib.parse.urlunparse(components)
+    print(result)
+
+
+将b'name=scbcbwdc&age=18&sex=1'转回为字典类型,不过字典中的数据是字节类型（bytes）类型
+parse.parse_qs()
+
+    form_data = parse.urlencode(form_data).encode('utf-8')
+    print(form_data)
+    result = parse.parse_qs(form_data)
+    print(result)
+    for name,value in result.items():
+        print(name.decode('utf-8'))
+        print(value[0].decode('utf-8'))
+
+部分拼接
+parse.urljoin
+    base_url = 'https://www.readnovel.com/book/9500446903583303#Catalog'
+    sub_url = '//www.readnovel.com/novel/12345.html'
+    result = parse.urljoin(base_url,sub_url)
+    print(result)
+
+
+第二个知识点
+怎么获取cookie
+import http.cookiejar
+
+1.创建一个cookiejar对象用来保存cookie
+cookieJar = http.cookiejar.CookieJar()
+
+2.cookie的处理器对象
+cookie_handler = urllib.request.HTTPCookieProcessor(cookieJar)
+http_handler = urllib.request.HTTPHandler()
+
+3、自定义opener
+opener = request.build_opener(cookie_handler,http_handler)
+
+4、发起请求
+response = opener.open(req)
+
+5、for cookie in cookieJar:
+    print(cookie.name,cookie.value)
+
+
+MozillaCookieJar的用法
+    filename = 'cookie.txt'
+    1、cookieJar = cookiejar.MozillaCookieJar(filename)
+    2、cookieJar.save()
+如何读取使用MozillaCookieJar读取本地cookie.txt文件
+    cookieJar = cookiejar.MozillaCookieJar('cookie.txt')
+    cookieJar.load('cookie.txt')
+
